@@ -711,6 +711,25 @@
   }
   @media(max-width:350px){.bottom-nav .view-tab{font-size:7.5px}.bottom-nav .view-tab-icon,.bottom-nav .view-tab-icon svg{width:16px;height:16px}.measurement-grid,.tool-form-grid{gap:6px}}
 
+  :root{--bg:#101216;--card:#191c22;--text:#f5f6f8;--muted:#9ba3af;--border:#2b3039;--accent:#4b8bff;--accent-dark:#3476ee;--pr-gold:#f5c451;--pr-bg:#2b2414;--danger:#ff626b;--chip-bg:#222731;color-scheme:dark}
+  body{background:var(--bg);color:var(--text);max-width:960px;padding:0 18px 116px}
+  header{position:relative;min-height:auto;padding:24px 72px 18px 4px;margin:0 auto 12px;background:transparent;border-bottom:1px solid var(--border);overflow:visible}
+  header:before,header:after,.header-ornament{display:none}.brand-lockup{gap:12px}.brand-mark{width:42px;height:42px;border-radius:14px;background:#18243a;border-color:#315992;color:#75aaff}
+  .brand-overline{color:#77aaff;letter-spacing:.14em;font-size:10px}header h1{font-size:clamp(22px,4vw,30px);letter-spacing:-.04em}header p{margin:5px 0 0 54px;color:var(--muted);font-size:13px}
+  .app-menu-trigger{top:22px;right:2px;width:44px;height:44px;border-radius:14px;background:var(--card);border-color:var(--border)}main{padding:0;max-width:900px;margin:auto}
+  .utility-panel{display:flex;justify-content:flex-end;margin:0 0 12px}#unitToggle{min-width:130px;background:#20242c;border:1px solid var(--border);border-radius:12px;padding:11px 16px}
+  .view-tabs.bottom-nav{position:fixed;z-index:30;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(520px,calc(100% - 24px));height:70px;padding:6px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:rgba(25,28,34,.96);border:1px solid #343a45;border-radius:20px;box-shadow:0 12px 40px #0008;backdrop-filter:blur(16px)}
+  .view-tab{min-width:0;min-height:56px;border:0;border-radius:14px;background:transparent;color:#aab1bc;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:5px 2px;font-size:11px;font-weight:700}.view-tab-icon svg{width:19px;height:19px}.view-tab.active{color:#fff;background:#263d60;box-shadow:inset 0 0 0 1px #3767a8}.view-tab.active .view-tab-icon{color:#78aaff}
+  .training-add-day{margin:10px 0 14px;padding:14px 15px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(120deg,#191c22,#1b2230);align-items:center}.training-add-day span{color:var(--muted);font-size:13px;line-height:1.45}
+  button,.btn-primary,.summary-action{min-height:44px}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #79aaff;outline-offset:2px}
+  .day-tab,.routine-tab,.starter-chip{background:#1b1e24;border-color:#343a44;color:#e9edf3}.day-tab.active,.routine-tab.active,.starter-chip:hover{background:#263d60;border-color:#4b8bff;color:#fff}
+  .add-day-bar,.add-box,.exercise-card,.calendar-card,.chart-card,.measurement-card,.tool-card,.analytics-card,.week-card,.empty-state{background:var(--card);border-color:var(--border);border-radius:16px}.add-box{padding:10px;margin:10px 0}
+  input,select,textarea{background:#111419!important;color:var(--text)!important;border-color:#343a44!important;border-radius:12px!important}.btn-primary,.summary-action.primary{background:var(--accent);color:#07111f;border:0;border-radius:12px;font-weight:800}.btn-primary:hover,.summary-action.primary:hover{background:#75aaff}
+  .workout-summary{margin:14px 0;padding:16px 17px;background:linear-gradient(140deg,#1b2029,#1e2a3b);border:1px solid #33445d;border-left:3px solid var(--accent);border-radius:18px;box-shadow:none}.summary-heading{margin-bottom:12px}.summary-title{letter-spacing:.08em}.summary-title i{background:var(--accent);box-shadow:0 0 0 5px #4b8bff22}.summary-metrics{gap:10px}.summary-metric b{font-size:26px}.summary-note{color:#a9caff}.summary-actions,.rest-controls{gap:8px}
+  .weekly-summary{margin:16px 0;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:16px}.exercise-card{margin:12px 0;padding:14px}.exercise-card h3{font-size:16px}.empty-state{padding:24px 18px;text-align:left}.empty-state h2,.empty-state h3{margin:6px 0 8px}.empty-state p{color:var(--muted);line-height:1.55}
+  .screen-heading{margin:8px 2px 16px}.screen-heading h2{margin:3px 0;font-size:24px;letter-spacing:-.035em}.screen-heading p{margin:0;color:var(--muted);font-size:13px}.eyebrow{font-size:10px;font-weight:800;letter-spacing:.13em;color:#79aaff}
+  .more-grid{display:grid;gap:10px}.more-card{width:100%;min-height:84px;padding:14px;display:flex;align-items:center;gap:13px;text-align:left;background:var(--card);border:1px solid var(--border);border-radius:16px;color:var(--text)}.more-card:hover{border-color:#4b8bff;background:#1c2430}.more-card-icon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:13px;background:#233653;color:#80b0ff;font-size:22px;font-weight:800}.more-card-copy{display:grid;gap:4px;flex:1}.more-card-copy b{font-size:15px}.more-card-copy small{font-size:12px;line-height:1.4;color:var(--muted)}.more-chevron{font-size:24px;color:#7b8492}.more-back{margin:6px 0 14px;min-height:38px;padding:0 12px;border:1px solid var(--border);border-radius:11px;background:#1b1e24;color:#b9c4d3;font-weight:700}.toast{z-index:50}
+  @media(max-width:600px){body{padding:0 12px calc(100px + env(safe-area-inset-bottom))}header{padding:18px 58px 14px 2px;margin-bottom:10px}.brand-mark{width:38px;height:38px}header p{margin-left:50px;font-size:12px}.app-menu-trigger{top:17px}.utility-panel{margin-bottom:8px}#unitToggle{min-height:40px;padding:8px 12px}.training-add-day{padding:12px}.training-add-day span{max-width:60%;font-size:12px}.add-box{display:flex;gap:8px}.add-box .input-wrap{min-width:0;flex:1}.add-box input{width:100%;min-width:0}.add-box .btn-primary{flex:0 0 auto;padding-inline:16px}.workout-summary{padding:13px;margin:10px 0}.summary-heading{gap:8px}.summary-metrics{grid-template-columns:1fr 1fr}.summary-note{grid-column:1/-1;text-align:left}.summary-actions{display:grid;grid-template-columns:1fr 1fr}.workout-controls,.rest-controls{display:contents}.summary-action{min-width:0;padding:0 10px;font-size:13px}.rest-controls select,.rest-controls button{width:100%;min-width:0}.weekly-summary{padding:12px}.more-card{min-height:80px}}
 </style>
 </head>
 <body>
@@ -765,6 +784,7 @@
   <div id="analisesView" style="display:none;"></div>
   <div id="medidasView" style="display:none;"></div>
   <div id="ferramentasView" style="display:none;"></div>
+  <div id="maisView" style="display:none;"></div>
 </main>
 
 <div class="toast" id="toast"></div>
@@ -1661,13 +1681,19 @@
     const tabs=[
       ["treino","Treino",'<path d="M4 19V5m0 14h16M8 15l4-4 3 2 5-6"/>'],
       ["evolucao","Evolução",'<path d="M4 19V5m0 14h16M7 15l4-4 3 2 4-6"/>'],
-      ["calendario","Calendário",'<rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M7.5 3v4M16.5 3v4M4 9h16M8 13h.01M12 13h.01M16 13h.01M8 17h.01M12 17h.01"/>'],
-      ["analises","Análises",'<path d="M4 19V5m0 14h16M7 15l3-4 3 2 4-6"/>'],
-      ["medidas","Medidas",'<path d="M4 7h16M7 4v6m4-6v3m4-3v6m4-6v3M4 17h16M7 14v6m4-6v3m4-3v6m4-6v3"/>'],
-      ["ferramentas","Ferramentas",'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h3m4 0h3M7 12h3m4 0h3M7 16h3m4 0h3"/>']
+      ["calendario","Calendário",'<rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M7.5 3v4M16.5 3v4M4 9h16"/>'],
+      ["mais","Mais",'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>']
     ];
-    el.innerHTML=tabs.map(([id,label,icon])=>`<button type="button" class="view-tab ${currentView===id?"active":""}" aria-current="${currentView===id?"page":"false"}" onclick="switchView('${id}')"><span class="view-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24">${icon}</svg></span><span>${label}</span></button>`).join("");
+    el.innerHTML=tabs.map(function(item){
+      const id=item[0],label=item[1],icon=item[2],active=currentView===id||(["analises","medidas","ferramentas"].includes(currentView)&&id==="mais");
+      return '<button type="button" class="view-tab '+(active?"active":"")+'" aria-current="'+(currentView===id?"page":"false")+'" onclick="switchView(&quot;'+id+'&quot;)"><span class="view-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24">'+icon+'</svg></span><span>'+label+'</span></button>';
+    }).join("");
   }
+  function renderMoreView(){
+    const el=document.getElementById("maisView"); if(!el)return;
+    el.innerHTML='<section class="more-hub"><div class="screen-heading"><span class="eyebrow">SEU TREINO, EM UM SÓ LUGAR</span><h2>Mais recursos</h2><p>Escolha o que deseja acompanhar.</p></div><div class="more-grid"><button class="more-card" onclick="switchView(\'analises\')"><span class="more-card-icon">↗</span><span class="more-card-copy"><b>Análises</b><small>Volume por grupo muscular e frequência.</small></span><span class="more-chevron">›</span></button><button class="more-card" onclick="switchView(\'medidas\')"><span class="more-card-icon">⌁</span><span class="more-card-copy"><b>Medidas corporais</b><small>Acompanhe peso e medidas ao longo do tempo.</small></span><span class="more-chevron">›</span></button><button class="more-card" onclick="switchView(\'ferramentas\')"><span class="more-card-icon">＋</span><span class="more-card-copy"><b>Ferramentas</b><small>Calculadora de anilhas e resumo para compartilhar.</small></span><span class="more-chevron">›</span></button></div></section>';
+  }
+  function addMoreBackButton(container){if(container&&!container.querySelector(".more-back"))container.insertAdjacentHTML("afterbegin",'<button class="more-back" onclick="switchView(\'mais\')">‹ Mais recursos</button>');}
   function renderDayTabs(){
     const bar = document.getElementById("addDayBar");
     bar.style.display = addingDay ? "flex" : "none";
@@ -2083,17 +2109,23 @@
 
   function render(){
     renderViewTabs();renderWorkoutSummary();renderWeeklySummary();
-    const views={treino:"treinoView",evolucao:"evolucaoView",calendario:"calendarioView",analises:"analisesView",medidas:"medidasView",ferramentas:"ferramentasView"};
+    const views={treino:"treinoView",evolucao:"evolucaoView",calendario:"calendarioView",analises:"analisesView",medidas:"medidasView",ferramentas:"ferramentasView",mais:"maisView"};
     Object.entries(views).forEach(([key,id])=>{const el=document.getElementById(id);if(el)el.style.display=currentView===key?"":"none";});
-    const isTraining=currentView==="treino";
-    document.getElementById("workoutSummary").style.display=isTraining?"":"none";
-    document.getElementById("weeklySummary").style.display=isTraining?"":"none";
-    if(isTraining){renderDayTabs();renderTreinoView();}
-    else if(currentView==="evolucao")renderEvolucaoView();
-    else if(currentView==="calendario")renderCalendarView();
-    else if(currentView==="analises")renderAnalyticsView();
-    else if(currentView==="medidas")renderBodyMeasurementsView();
-    else if(currentView==="ferramentas")renderToolsView();
+    const summary=document.getElementById("workoutSummary"),weekly=document.getElementById("weeklySummary");
+    if(currentView==="treino"){
+      renderDayTabs();renderTreinoView();
+      const workspace=document.getElementById("dayWorkspace"),list=document.getElementById("exerciseList");
+      if(workspace&&summary)workspace.after(summary); if(list&&weekly)list.after(weekly);
+      summary.style.display=data.days.length?"":"none";weekly.style.display=data.days.length?"":"none";
+    }else{
+      summary.style.display="none";weekly.style.display="none";
+      if(currentView==="evolucao")renderEvolucaoView();
+      else if(currentView==="calendario")renderCalendarView();
+      else if(currentView==="analises"){renderAnalyticsView();addMoreBackButton(document.getElementById("analisesView"));}
+      else if(currentView==="medidas"){renderBodyMeasurementsView();addMoreBackButton(document.getElementById("medidasView"));}
+      else if(currentView==="ferramentas"){renderToolsView();addMoreBackButton(document.getElementById("ferramentasView"));}
+      else if(currentView==="mais")renderMoreView();
+    }
   }
   document.getElementById("newExerciseInput").addEventListener("keydown", e => {
     if(e.key === "ArrowDown"){
