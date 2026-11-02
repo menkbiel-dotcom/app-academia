@@ -1393,7 +1393,7 @@
     input.focus();
   }
   function cancelAddDay(){ addingDay = false; render(); }
-  function syncDayDraft(value){ newDayDraft = value; }
+  function syncDayDraft(value){ newDayDraft = value; const title=document.getElementById("newDayPreviewTitle"); if(title) title.textContent=value.trim()?`Treino ${value.trim()}`:"Escolha um nome para o dia"; }
   function confirmAddDay(){
     const name = newDayDraft.trim();
     if(!name){ addingDay = false; render(); return; }
@@ -1798,7 +1798,7 @@
     if(addingDay){
       workspace.innerHTML = "";
       const draftName = newDayDraft.trim();
-      list.innerHTML = `<section class="empty-state"><span class="empty-state-kicker">NOVO DIA · EM PREPARAÇÃO</span><h3>${draftName ? `Treino ${escapeHtml(draftName)}` : "Escolha um nome para o dia"}</h3><p>Os exercícios começam vazios neste dia. Confirme no botão ✓ acima para criar e adicionar os exercícios.</p></section>`;
+      list.innerHTML = `<section class="empty-state"><span class="empty-state-kicker">NOVO DIA · EM PREPARAÇÃO</span><h3 id="newDayPreviewTitle">${draftName ? `Treino ${escapeHtml(draftName)}` : "Escolha um nome para o dia"}</h3><p>Os exercícios começam vazios neste dia. Confirme no botão ✓ acima para criar e adicionar os exercícios.</p></section>`;
       return;
     }
 
@@ -2041,7 +2041,7 @@
     const entries=[...(data.bodyMeasurements||[])].sort((a,b)=>new Date(a.date)-new Date(b.date));
     const options=[["weight","Peso"],["waist","Cintura"],["chest","Peito"],["hips","Quadril"],["arm","Braço"],["thigh","Coxa"]].map(([key,label])=>`<option value="${key}" ${bodyMetric===key?"selected":""}>${label}</option>`).join("");
     const list=entries.slice().reverse().map(entry=>{
-      const values=[["Peso",entry.weight===null?null:formatLoad(entry.weight)],["Cintura",entry.waist],["Peito",entry.chest],["Quadril",entry.hips],["Braço",entry.arm],["Coxa",entry.thigh]].filter(item=>item[1]!==null&&item[1]!==undefined).map(item=>item[0]+": "+item[1]+(item[0]==="Peso"?" "+unit:" cm")).join(" · ");
+      const values=[["Peso",entry.weight===null?null:Number(displayLoad(entry.weight).toFixed(2))],["Cintura",entry.waist],["Peito",entry.chest],["Quadril",entry.hips],["Braço",entry.arm],["Coxa",entry.thigh]].filter(item=>item[1]!==null&&item[1]!==undefined).map(item=>item[0]+": "+item[1]+(item[0]==="Peso"?" "+unit:" cm")).join(" · ");
       return `<article class="measure-entry"><div><b>${formatDate(entry.date)}</b><span>${values}</span></div><button type="button" aria-label="Remover medidas de ${formatDate(entry.date)}" onclick="removeBodyMeasurement('${entry.id}')">×</button></article>`;
     }).join("");
     container.innerHTML=`<div class="insights-heading"><span class="evo-kicker">ACOMPANHAMENTO PESSOAL</span><h2>Medidas</h2><p>Registros locais, incluídos no backup do app.</p></div>
