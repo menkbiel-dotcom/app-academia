@@ -1,7 +1,7 @@
 {
   "name": "Diário de Treino",
   "short_name": "Treino",
-  "description": "Registre exercícios, séries, carga e recordes pessoais na academia.",
+  "description": "Organize rotinas, registre séries, acompanhe medidas e analise seu progresso.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

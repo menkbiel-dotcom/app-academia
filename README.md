@@ -1,41 +1,44 @@
 # Diário de Treino
 
-App web para organizar rotinas de academia, registrar séries e acompanhar a evolução dos exercícios.
+App web para organizar rotinas de academia, registrar séries e acompanhar o progresso.
 
 **Acesse:** [menkbiel-dotcom.github.io/app-academia](https://menkbiel-dotcom.github.io/app-academia/)
 
-## Funcionalidades
+## Navegação
 
-- Crie rotinas reutilizáveis e duplique uma rotina para montar variações.
-- Registre carga, repetições e tipo da série: **A** (aquecimento), **N** (normal) ou **F** (falha).
-- Ao abrir um exercício, veja carga e repetições da última sessão para agilizar o registro.
-- Marque séries concluídas para iniciar o descanso automático, configurável por exercício.
-- Registre uma nota por sessão e o RPE (esforço percebido de 1 a 10) em cada série.
-- Acompanhe a evolução por **1RM estimado**, **maior carga**, **repetições** ou **volume**.
-- Veja recordes pessoais e históricos dos exercícios.
-- Inicie, pause e encerre sessões. Ao encerrar, veja duração, exercícios, séries, volume e novos recordes.
-- Consulte sessões anteriores e duração no calendário e veja o resumo semanal.
-- Alterne entre kg e lb.
-- Exporte e importe backups pelo menu de três pontos.
+- **Treino:** rotinas reutilizáveis, séries, descanso, superséries e metas de repetições.
+- **Evolução:** histórico e gráficos por 1RM estimado, maior carga, repetições ou volume.
+- **Calendário:** treinos registrados e duração das sessões concluídas.
+- **Análises:** séries da última semana por grupo muscular.
+- **Medidas:** peso corporal, cintura, peito, quadril, braço e coxa, com gráficos.
+- **Ferramentas:** calculadora de anilhas e compartilhamento/exportação de uma rotina ou resumo de treino.
 
-## Uso no celular
+## Recursos de treino
 
-A interface se adapta a telas pequenas e oferece navegação na parte inferior.
+- Carga, repetições, tipo da série: **A** (aquecimento), **N** (normal) ou **F** (falha).
+- Sugestão dos valores registrados na sessão anterior do exercício.
+- RPE opcional de 1 a 10 por série e notas por sessão.
+- Descanso automático configurável para cada exercício.
+- Superséries/circuitos identificados por grupos. Ao concluir uma série, a tela avança para o próximo exercício do mesmo grupo.
+- Faixa de repetições por exercício. Ao atingir o limite superior em todas as séries válidas, o app sugere considerar um aumento de carga; a alteração continua sob seu controle.
+- Resumo ao encerrar: duração, exercícios, séries, volume e recordes.
 
-Você pode adicionar o app à tela inicial:
+## No celular
 
-- **Android (Chrome):** abra o app, toque no menu do navegador e escolha **Instalar app** ou **Adicionar à tela inicial**.
-- **iPhone/iPad (Safari):** toque em **Compartilhar** e escolha **Adicionar à Tela de Início**.
+A interface se adapta a telas pequenas e pode ser adicionada à tela inicial:
 
-Depois de abrir o app uma vez, os arquivos do aplicativo ficam disponíveis para uso offline.
+- **Android (Chrome):** menu do navegador → **Instalar app** ou **Adicionar à tela inicial**.
+- **iPhone/iPad (Safari):** **Compartilhar** → **Adicionar à Tela de Início**.
+
+Depois da primeira visita, os arquivos do app ficam disponíveis para uso offline.
 
 ## Dados e privacidade
 
-O histórico fica salvo localmente no navegador do dispositivo. Nesta versão, os dados não são sincronizados entre aparelhos nem enviados para uma conta na nuvem. Para transferir ou proteger seus registros, use **Exportar backup** e guarde o arquivo em um local seguro.
+Os dados de treino e medidas ficam no armazenamento local do navegador deste dispositivo. Nesta versão, não há sincronização em nuvem. O backup completo fica no menu de três pontos; as medidas também são incluídas nele. Para compartilhar somente uma rotina, use a aba **Ferramentas**.
 
-Limpar os dados do navegador ou desinstalá-lo pode apagar o histórico local. Importar um backup substitui os dados existentes neste navegador pelos dados do arquivo.
+Limpar os dados do navegador ou desinstalá-lo pode apagar o histórico local. Importar um backup substitui os dados atuais deste navegador.
 
-## Publicação
+## Publicação e arquivos
 
 O app está publicado pelo GitHub Pages:
 
@@ -43,9 +46,7 @@ https://menkbiel-dotcom.github.io/app-academia/
 
 A branch `main` é publicada a partir da pasta raiz. Não é necessário instalar dependências nem executar um processo de build.
 
-## Arquivos principais
-
-- `index.html` — interface e funcionalidades do app.
-- `manifest.json` — nome, ícones e configuração para instalação.
-- `service-worker.js` — cache dos arquivos do app para acesso offline.
-- `icons/` — ícones usados pelo app instalado.
+- `index.html` — interface e funcionalidades.
+- `manifest.json` — nome, ícones e configuração de instalação.
+- `service-worker.js` — cache para acesso offline.
+- `icons/` — ícones do app instalado.
