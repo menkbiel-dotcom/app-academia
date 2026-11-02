@@ -1,4 +1,4 @@
-const CACHE_NAME = "diario-treino-v14";
+const CACHE_NAME = "diario-treino-v15";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -20,7 +20,7 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(
-      keys.filter((key) => key.startsWith("diario-treino-") && key !== CACHE_NAME).map((key) => caches.delete(key))
+        keys.filter((key) => key.startsWith("diario-treino-") && key !== CACHE_NAME).map((key) => caches.delete(key))
       )
     )
   );

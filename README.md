@@ -4,43 +4,44 @@ App web para organizar rotinas de academia, registrar séries e acompanhar a evo
 
 **Acesse:** [menkbiel-dotcom.github.io/app-academia](https://menkbiel-dotcom.github.io/app-academia/)
 
-## O que você pode fazer
+## Funcionalidades
 
-- Criar dias ou rotinas de treino e adicionar exercícios a cada dia.
-- Registrar carga, repetições e tipo de série: **A** (aquecimento), **N** (normal) ou **F** (falha).
-- Acompanhar recordes pessoais e comparar com registros anteriores.
-- Iniciar, pausar e encerrar uma sessão. O cronômetro só começa quando você inicia o treino.
-- Usar o temporizador de descanso entre as séries.
-- Ver o gráfico de evolução escolhendo um exercício na aba **Evolução**.
-- Consultar dias e sessões anteriores na aba **Calendário**.
-- Ver um resumo semanal de treinos, séries e dias ativos.
-- Trocar a unidade de carga entre kg e lb.
-- Exportar e importar um backup pelo menu de três pontos.
+- Crie rotinas reutilizáveis e duplique uma rotina para montar variações.
+- Registre carga, repetições e tipo da série: **A** (aquecimento), **N** (normal) ou **F** (falha).
+- Ao abrir um exercício, veja carga e repetições da última sessão para agilizar o registro.
+- Marque séries concluídas para iniciar o descanso automático, configurável por exercício.
+- Registre uma nota por sessão e o RPE (esforço percebido de 1 a 10) em cada série.
+- Acompanhe a evolução por **1RM estimado**, **maior carga**, **repetições** ou **volume**.
+- Veja recordes pessoais e históricos dos exercícios.
+- Inicie, pause e encerre sessões. Ao encerrar, veja duração, exercícios, séries, volume e novos recordes.
+- Consulte sessões anteriores e duração no calendário e veja o resumo semanal.
+- Alterne entre kg e lb.
+- Exporte e importe backups pelo menu de três pontos.
 
-## No celular
+## Uso no celular
 
-A interface se adapta a telas pequenas e tem navegação na parte inferior.
+A interface se adapta a telas pequenas e oferece navegação na parte inferior.
 
-Você também pode adicionar o app à tela inicial:
+Você pode adicionar o app à tela inicial:
 
 - **Android (Chrome):** abra o app, toque no menu do navegador e escolha **Instalar app** ou **Adicionar à tela inicial**.
 - **iPhone/iPad (Safari):** toque em **Compartilhar** e escolha **Adicionar à Tela de Início**.
 
-Após abrir o app uma vez, os arquivos do aplicativo ficam disponíveis para uso offline. Os dados ficam armazenados no navegador do dispositivo.
+Depois de abrir o app uma vez, os arquivos do aplicativo ficam disponíveis para uso offline.
 
 ## Dados e privacidade
 
-O histórico de treino é salvo localmente no navegador por meio do armazenamento do próprio dispositivo. Nesta versão, os dados não são sincronizados entre aparelhos nem enviados para uma conta na nuvem. Para transferir ou proteger seus registros, use **Exportar backup** no menu de três pontos e guarde o arquivo em um local seguro.
+O histórico fica salvo localmente no navegador do dispositivo. Nesta versão, os dados não são sincronizados entre aparelhos nem enviados para uma conta na nuvem. Para transferir ou proteger seus registros, use **Exportar backup** e guarde o arquivo em um local seguro.
 
-Limpar os dados do navegador ou desinstalar o navegador pode apagar o histórico local. Importar um backup restaura os registros contidos naquele arquivo.
+Limpar os dados do navegador ou desinstalá-lo pode apagar o histórico local. Importar um backup substitui os dados existentes neste navegador pelos dados do arquivo.
 
 ## Publicação
 
-O app está publicado pelo GitHub Pages em:
+O app está publicado pelo GitHub Pages:
 
 https://menkbiel-dotcom.github.io/app-academia/
 
-O repositório publica a branch `main` a partir da pasta raiz. Não é necessário instalar dependências ou executar um processo de build: o app usa HTML, CSS e JavaScript no navegador.
+A branch `main` é publicada a partir da pasta raiz. Não é necessário instalar dependências nem executar um processo de build.
 
 ## Arquivos principais
 

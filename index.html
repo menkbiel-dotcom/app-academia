@@ -631,6 +631,31 @@
   .calendar-cell.has-workout .calendar-date-number{color:#8bbaff;}
   .calendar-cell.is-selected.has-workout .calendar-date-number{color:#f4f8ff;}
   @media(max-width:390px){.weekly-summary{padding:11px}.weekly-summary-metrics{gap:5px}.weekly-summary-metric{padding:9px 5px}.weekly-summary-metric b{font-size:19px}.weekly-summary-metric span{font-size:8px}.workout-controls,.rest-controls{gap:5px}.workout-controls .summary-action{font-size:10px}}
+
+  /* Registro rápido, notas, métricas e resumo de sessão */
+  .set-table-head,.set-row{grid-template-columns:20px minmax(0,1fr) minmax(0,.72fr) 44px 48px 36px 26px;}
+  .set-rpe{min-width:0;width:48px;min-height:38px;padding:3px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font:inherit;font-size:11px;text-align:center;}
+  .exercise-session-note{display:grid;gap:5px;margin:10px 0;}
+  .exercise-session-note label,.exercise-rest-setting label{font-size:11px;font-weight:750;color:var(--muted);}
+  .exercise-session-note textarea{width:100%;min-height:58px;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font:inherit;font-size:12px;resize:vertical;}
+  .exercise-rest-setting{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0;color:var(--muted);font-size:11px;}
+  .exercise-rest-setting select,.evo-metric-control select{min-height:36px;padding:6px 10px;border:1px solid var(--border);border-radius:9px;background:var(--card);color:var(--text);font:inherit;}
+  .exercise-rest-setting span{font-size:10px;}
+  .session-note-text{margin:6px 0;color:var(--muted);font-size:12px;white-space:pre-wrap;}
+  .evo-metric-control{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 9px;padding:10px 13px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--muted);font-size:12px;font-weight:700;}
+  .workout-recap-overlay{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:18px;background:rgba(5,9,15,.76);backdrop-filter:blur(5px);}
+  .workout-recap{width:min(100%,420px);padding:22px;border:1px solid var(--border);border-radius:22px;background:var(--card);color:var(--text);box-shadow:0 22px 70px rgba(0,0,0,.4);}
+  .workout-recap h2{margin:5px 0;font-size:24px;}
+  .recap-kicker{color:var(--accent);font-size:10px;font-weight:850;letter-spacing:.12em;}
+  .recap-duration{margin:5px 0 17px;color:var(--muted);}
+  .recap-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+  .recap-metrics div{display:grid;gap:4px;padding:11px 8px;border:1px solid var(--border);border-radius:12px;background:var(--bg);}
+  .recap-metrics b{font-size:19px;font-variant-numeric:tabular-nums;}
+  .recap-metrics span{color:var(--muted);font-size:10px;}
+  .recap-pr{margin:13px 0;color:var(--pr-gold);font-weight:750;}
+  .workout-recap .btn-primary{width:100%;min-height:44px;margin-top:16px;}
+  @media(max-width:390px){.set-table-head,.set-row{grid-template-columns:17px minmax(0,1fr) minmax(0,.68fr) 33px 42px 31px 24px;gap:3px}.set-rpe{width:42px;font-size:10px}.recap-metrics{gap:5px}.recap-metrics div{padding:9px 5px}}
+
 </style>
 </head>
 <body>
@@ -661,9 +686,9 @@
   <section class="workout-summary" id="workoutSummary" aria-live="polite"></section>
   <section class="weekly-summary" id="weeklySummary" aria-label="Resumo desta semana"></section>
   <div id="treinoView">
-    <div class="training-add-day" id="trainingAddDay"><span>Organize seu treino por rotina.</span><button type="button" onclick="startAddDay()">＋ Novo dia</button></div>
+    <div class="training-add-day" id="trainingAddDay"><span>Organize suas rotinas por modelo; treinos concluídos ficam no Calendário.</span><button type="button" onclick="startAddDay()">＋ Nova rotina</button></div>
     <div class="add-day-bar" id="addDayBar" style="display:none;">
-      <input type="text" id="newDayInput" maxlength="120" placeholder="Nome do dia (ex: Peito, Costas, Perna)" enterkeyhint="done"
+      <input type="text" id="newDayInput" maxlength="120" placeholder="Nome da rotina (ex: Peito, Costas, Pernas)" enterkeyhint="done"
         oninput="syncDayDraft(this.value)" onkeydown="if(event.key==='Enter'){confirmAddDay();}">
       <button class="btn-primary" onclick="confirmAddDay()">✓</button>
       <button class="del-btn" onclick="cancelAddDay()">✕</button>
@@ -695,9 +720,11 @@
   const MAX_SESSIONS_PER_EXERCISE = 2000;
   const MAX_SETS_PER_SESSION = 100;
   const MAX_NAME_LENGTH = 120;
-  let data = { days: [], exercises: [], currentDayId: null };
+  let data = { days: [], exercises: [], currentDayId: null, workoutHistory: [] };
   let openId = null;
   let draft = {};
+  let draftNotes = {};
+  let evoMetric = "e1rm";
   let addingDay = false;
   let newDayDraft = "";
   let currentView = "treino"; // "treino" | "evolucao" | "calendario"
@@ -948,7 +975,7 @@
       if(!isValidBackupData(incoming)) throw new Error("Formato de backup inválido");
       showConfirm("Importar este backup substituirá os dados atuais deste navegador. Deseja continuar?", () => {
         data = incoming; unit = backup.unit === "lb" ? "lb" : (incoming.unit === "lb" ? "lb" : "kg");
-        editingSession = null; draft = {}; migrate();
+        editingSession = null; draft = {}; draftNotes = {}; migrate();
         normalizeRestoredWorkout();
         if(summaryInterval) clearInterval(summaryInterval);
         summaryInterval = null;
@@ -993,18 +1020,20 @@
   function repeatLastSession(exId){
     const ex = data.exercises.find(item => item.id === exId);
     if(!ex || !ex.history.length) return;
-    draft[exId] = ex.history[0].sets.map(set => ({ weight:String(Number(displayLoad(set.weight).toFixed(2))), reps:String(set.reps), tag:set.tag || "N" }));
+    draft[exId] = ex.history[0].sets.map(set => ({ weight:String(Number(displayLoad(set.weight).toFixed(2))), reps:String(set.reps), tag:set.tag || "N", rpe:set.rpe||"", done:false }));
+    draftNotes[exId] = "";
     openId = exId; editingSession = null; render();
   }
   function editSession(exId, sessionId){
     const ex = data.exercises.find(item => item.id === exId), session = ex?.history.find(item => item.id === sessionId);
     if(!session) return;
     editingSession = { exId, sessionId };
-    draft[exId] = session.sets.map(set => ({ weight:String(Number(displayLoad(set.weight).toFixed(2))), reps:String(set.reps), tag:set.tag || "N" }));
+    draft[exId] = session.sets.map(set => ({ weight:String(Number(displayLoad(set.weight).toFixed(2))), reps:String(set.reps), tag:set.tag || "N", rpe:set.rpe||"", done:false }));
+    draftNotes[exId] = session.note || "";
     openId = exId; render();
   }
   function cancelEditSession(){
-    if(editingSession) draft[editingSession.exId] = [{weight:"",reps:"",tag:"N"}];
+    if(editingSession){ draft[editingSession.exId] = [{weight:"",reps:"",tag:"N",rpe:"",done:false}]; draftNotes[editingSession.exId]=""; }
     editingSession = null; render();
   }
   function deleteSession(exId, sessionId){
@@ -1026,12 +1055,13 @@
     const workout = data.activeWorkout;
     if(!workout) return;
     const elapsedSeconds = workoutElapsedSeconds(workout);
-    data.activeWorkout = {dayId:workout.dayId,elapsedSeconds,startedAt:null,running:false};
+    data.activeWorkout = {dayId:workout.dayId,firstStartedAt:workout.firstStartedAt || workout.startedAt || new Date().toISOString(),elapsedSeconds,startedAt:null,running:false};
   }
   function startWorkout(){
     if(!data.currentDayId){ showToast('Crie um dia de treino primeiro (toque em "+ dia")', "info"); return; }
     if(data.activeWorkout){ showToast("Já existe um treino em andamento. Continue ou encerre esse treino.","info"); return; }
-    data.activeWorkout = { dayId:data.currentDayId, startedAt:new Date().toISOString(), elapsedSeconds:0, running:true }; save(); renderWorkoutSummary();
+    const startedAt = new Date().toISOString();
+    data.activeWorkout = { dayId:data.currentDayId, firstStartedAt:startedAt, startedAt, elapsedSeconds:0, running:true }; save(); renderWorkoutSummary();
     if(summaryInterval) clearInterval(summaryInterval);
     summaryInterval = setInterval(updateWorkoutClock, 1000);
   }
@@ -1049,6 +1079,7 @@
     if(!data.activeWorkout || data.activeWorkout.running) return;
     if(data.days.some(day=>day.id===data.activeWorkout.dayId)) data.currentDayId = data.activeWorkout.dayId;
     data.activeWorkout.startedAt = new Date().toISOString();
+    if(!data.activeWorkout.firstStartedAt) data.activeWorkout.firstStartedAt = data.activeWorkout.startedAt;
     data.activeWorkout.running = true;
     save(); render();
     if(summaryInterval) clearInterval(summaryInterval);
@@ -1056,19 +1087,49 @@
   }
   function finishWorkout(){
     if(!data.activeWorkout) return;
-    const durationSeconds = workoutElapsedSeconds();
-    data.latestWorkout = { dayId:data.activeWorkout.dayId, durationSeconds, finishedAt:new Date().toISOString() };
-    data.activeWorkout = null; save();
-    if(summaryInterval) clearInterval(summaryInterval); summaryInterval = null;
-    renderWorkoutSummary(); showToast(`Treino concluído: ${formatDuration(durationSeconds)}`);
+    const workout = data.activeWorkout;
+    const durationSeconds = workoutElapsedSeconds(workout);
+    const startedAt = workout.firstStartedAt || workout.startedAt || new Date(Date.now()-durationSeconds*1000).toISOString();
+    const finishedAt = new Date().toISOString();
+    const logged = data.exercises.filter(ex=>ex.dayId===workout.dayId).flatMap(ex=>ex.history.filter(session=>Date.parse(session.date)>=Date.parse(startedAt)).map(session=>({ex,session})));
+    const sets = logged.flatMap(item=>item.session.sets);
+    const exerciseIds = new Set(logged.map(item=>item.ex.id));
+    const prs = logged.reduce((total,item)=>{
+      const ids = new Set(item.session.sets.map(set=>set.id));
+      const previous = allSets(item.ex).filter(set=>!ids.has(set.id)&&set.tag!=="A");
+      const previousBest = previous.reduce((best,set)=>!best||set.e1rm>best.e1rm?set:best,null);
+      const newBest = item.session.sets.filter(set=>set.tag!=="A").reduce((best,set)=>!best||set.e1rm>best.e1rm?set:best,null);
+      return total+(newBest&&(!previousBest||newBest.e1rm>previousBest.e1rm)?1:0);
+    },0);
+    const summary={dayId:workout.dayId,startedAt,finishedAt,durationSeconds,exerciseCount:exerciseIds.size,setCount:sets.length,volume:sets.reduce((total,set)=>total+displayLoad(set.weight)*set.reps,0),prCount:prs};
+    data.latestWorkout={dayId:workout.dayId,durationSeconds,finishedAt};
+    data.workoutHistory.push(summary);
+    data.workoutHistory=data.workoutHistory.slice(-500);
+    data.activeWorkout=null;
+    save();
+    if(summaryInterval) clearInterval(summaryInterval);
+    summaryInterval=null;
+    renderWorkoutSummary();
+    showWorkoutRecap(summary);
+  }
+    function showWorkoutRecap(summary){
+    const dayName=data.days.find(day=>day.id===summary.dayId)?.name||"Treino";
+    const overlay=document.createElement("div");
+    overlay.className="workout-recap-overlay";
+    const values=[["Exercícios",summary.exerciseCount],["Séries",summary.setCount],["Volume ("+unit+")",Math.round(summary.volume).toLocaleString("pt-BR")]];
+    overlay.innerHTML='<section class="workout-recap" role="dialog" aria-modal="true" aria-labelledby="recapTitle"><span class="recap-kicker">SESSÃO CONCLUÍDA</span><h2 id="recapTitle">'+escapeHtml(dayName)+'</h2><p class="recap-duration">'+formatDuration(summary.durationSeconds)+' de treino</p><div class="recap-metrics">'+values.map(item=>'<div><b>'+item[1]+'</b><span>'+item[0]+'</span></div>').join("")+'</div>'+(summary.prCount?'<p class="recap-pr">🏆 '+summary.prCount+' novo(s) recorde(s)</p>':"")+'<button type="button" class="btn-primary">Concluir</button></section>';
+    overlay.addEventListener("click",event=>{if(event.target===overlay)overlay.remove();});
+    document.body.appendChild(overlay);
+    overlay.querySelector("button")?.addEventListener("click",()=>overlay.remove());
+    overlay.querySelector("button")?.focus();
   }
   function formatDuration(seconds){ return `${Math.floor(seconds/60)} min${seconds%60 ? ` ${seconds%60}s` : ""}`; }
   function updateWorkoutClock(){
     const el = document.getElementById("workoutElapsed");
     if(el && data.activeWorkout) el.textContent = formatDuration(workoutElapsedSeconds());
   }
-  function startRestTimer(){
-    let seconds = 90; try{ seconds = Number(localStorage.getItem("workoutRestSeconds") || 90); }catch(_e){}
+  function startRestTimer(customSeconds){
+    let seconds = Number(customSeconds); if(!Number.isFinite(seconds) || seconds < 15){ seconds = 90; try{ seconds = Number(localStorage.getItem("workoutRestSeconds") || 90); }catch(_e){} }
     if(!Number.isFinite(seconds) || seconds < 1) seconds = 90;
     seconds = Math.min(seconds, 3600);
     restTimerEndsAt = Date.now() + seconds*1000;
@@ -1107,6 +1168,7 @@
   function migrate(){
     data.days = Array.isArray(data.days) ? data.days.filter(day => day && typeof day === "object").slice(0,MAX_DAYS) : [];
     data.exercises = Array.isArray(data.exercises) ? data.exercises.filter(ex => ex && typeof ex === "object").slice(0,MAX_EXERCISES) : [];
+    data.workoutHistory = Array.isArray(data.workoutHistory) ? data.workoutHistory.filter(item => item && typeof item === "object" && Number.isFinite(Date.parse(item.finishedAt))).slice(-500) : [];
     if(!["kg","lb"].includes(data.unit)) data.unit = "kg";
     const usedIds = new Set();
     data.days.forEach(day => {
@@ -1120,6 +1182,10 @@
       ex.name = ex.name.slice(0,MAX_NAME_LENGTH) || "Exercício";
       if(typeof ex.id !== "string" || !/^[A-Za-z0-9_-]+$/.test(ex.id) || usedIds.has(ex.id)) ex.id = "ex_" + Math.random().toString(36).slice(2);
       usedIds.add(ex.id);
+      if(typeof ex.notes !== "string") ex.notes = "";
+      ex.notes = ex.notes.slice(0,1000);
+      if(!Number.isInteger(Number(ex.restSeconds)) || Number(ex.restSeconds)<15 || Number(ex.restSeconds)>600) ex.restSeconds = 90;
+      else ex.restSeconds = Number(ex.restSeconds);
       if(!Array.isArray(ex.history)) ex.history = [];
       ex.history = ex.history.filter(session => session && typeof session === "object").slice(0,MAX_SESSIONS_PER_EXERCISE);
     });
@@ -1133,6 +1199,8 @@
         }));
       }
       ex.history.forEach(sess => {
+        if(typeof sess.note !== "string") sess.note = "";
+        sess.note = sess.note.slice(0,1000);
         if(!Array.isArray(sess.sets)) sess.sets = [];
         if(typeof sess.id !== "string" || !/^[A-Za-z0-9_-]+$/.test(sess.id) || usedIds.has(sess.id)) sess.id = "session_" + Math.random().toString(36).slice(2);
         usedIds.add(sess.id);
@@ -1141,6 +1209,7 @@
         sess.sets.forEach(set => {
           if(!["A","N","F"].includes(set.tag)) set.tag = "N";
           set.weight = Number(set.weight); set.reps = Number(set.reps);
+          set.rpe = Number.isInteger(Number(set.rpe)) && Number(set.rpe)>=1 && Number(set.rpe)<=10 ? Number(set.rpe) : null;
           set.e1rm = e1rm(set.weight,set.reps);
         });
       });
@@ -1150,6 +1219,7 @@
     }
     data.exercises.forEach(ex => { if(!data.days.some(day => day.id === ex.dayId)) ex.dayId = data.days[0] ? data.days[0].id : null; });
     if(data.activeWorkout && (!data.days.some(day => day.id === data.activeWorkout.dayId) || (data.activeWorkout.running === false ? !Number.isFinite(Number(data.activeWorkout.elapsedSeconds)) : !Number.isFinite(Date.parse(data.activeWorkout.startedAt))))) data.activeWorkout = null;
+    if(data.activeWorkout && !Number.isFinite(Date.parse(data.activeWorkout.firstStartedAt))) data.activeWorkout.firstStartedAt = data.activeWorkout.startedAt || new Date().toISOString();
     if(data.latestWorkout && (typeof data.latestWorkout !== "object" || !data.days.some(day => day.id === data.latestWorkout.dayId) || !Number.isFinite(Number(data.latestWorkout.durationSeconds)) || Number(data.latestWorkout.durationSeconds) < 0)) data.latestWorkout = null;
     if(!data.days.some(day => day.id === data.currentDayId)){ data.currentDayId = data.days[0] ? data.days[0].id : null; }
   }
@@ -1294,7 +1364,11 @@
     if(openId === id){ openId = null; }
     else{
       openId = id;
-      if(!draft[id] || !draft[id].length) draft[id] = [{ weight:"", reps:"", tag:"N" }];
+      const ex = data.exercises.find(item=>item.id===id);
+      if(!draft[id] || !draft[id].length){
+        const previous = ex && ex.history && ex.history[0];
+        draft[id] = previous && previous.sets.length ? previous.sets.map(set=>({weight:String(Number(displayLoad(set.weight).toFixed(2))),reps:String(set.reps),tag:set.tag||"N",done:false})) : [{weight:"",reps:"",tag:"N",done:false}];
+      }
     }
     render();
   }
@@ -1309,7 +1383,10 @@
     render();
   }
   function syncDraft(exId, idx, field, value){ draft[exId][idx][field] = value; }
+  function syncDraftNote(exId,value){ draftNotes[exId] = value.slice(0,1000); }
+  function saveExerciseRest(exId,value){ const ex=data.exercises.find(item=>item.id===exId); const seconds=Number(value); if(ex && Number.isInteger(seconds) && seconds>=15 && seconds<=600){ ex.restSeconds=seconds; save(); } }
   function setTag(exId, idx, tag){ draft[exId][idx].tag = tag; render(); }
+  function rpeOptions(value){ let html='<option value="">RPE</option>'; for(let n=1;n<=10;n++) html += '<option value="'+n+'"'+(Number(value)===n?' selected':'')+'>'+n+'</option>'; return html; }
   function toggleSetDone(exId, idx, button){
     const row = draft[exId]?.[idx];
     if(!row || !button) return;
@@ -1318,6 +1395,7 @@
     button.setAttribute("aria-pressed", String(row.done));
     button.setAttribute("aria-label", row.done ? `Série ${idx+1} concluída` : `Marcar série ${idx+1} como concluída`);
     button.closest(".set-row")?.classList.toggle("is-done", row.done);
+    if(row.done){ const ex=data.exercises.find(item=>item.id===exId); startRestTimer(ex && ex.restSeconds); }
   }
 
   function saveSession(exId){
@@ -1328,8 +1406,8 @@
     }
     const ex = data.exercises.find(e => e.id === exId);
     if(!ex) return;
-    const parsedRows = rows.map(r => ({ weight: Number(r.weight), reps: Number(r.reps), tag: r.tag || "N" }));
-    if(parsedRows.some(r => !Number.isFinite(r.weight) || r.weight <= 0 || !Number.isInteger(r.reps) || r.reps <= 0 || !Number.isFinite(e1rm(fromDisplayLoad(r.weight),r.reps)))){
+    const parsedRows = rows.map(r => ({ weight: Number(r.weight), reps: Number(r.reps), tag: r.tag || "N", rpe:r.rpe===""||r.rpe===undefined?null:Number(r.rpe) }));
+    if(parsedRows.some(r => !Number.isFinite(r.weight) || r.weight <= 0 || !Number.isInteger(r.reps) || r.reps <= 0 || (r.rpe!==null && (!Number.isInteger(r.rpe)||r.rpe<1||r.rpe>10)) || !Number.isFinite(e1rm(fromDisplayLoad(r.weight),r.reps)))){
       showToast("Use carga maior que zero e repetições inteiras maiores que zero", "info");
       return;
     }
@@ -1339,15 +1417,16 @@
     const prevPR = previousSets.length ? previousSets.reduce((best,set) => set.e1rm > best.e1rm ? set : best, previousSets[0]) : null;
     const sets = parsedRows.map(r => {
       const { reps } = r, weight = fromDisplayLoad(r.weight);
-      return { id: "set_" + Date.now() + "_" + Math.random().toString(36).slice(2), weight, reps, e1rm: e1rm(weight, reps), tag: r.tag };
+      return { id: "set_" + Date.now() + "_" + Math.random().toString(36).slice(2), weight, reps, e1rm: e1rm(weight, reps), tag: r.tag, rpe:r.rpe };
     });
     if(oldSession){
       const index = ex.history.findIndex(session => session.id === oldSession.id);
-      ex.history[index] = { ...oldSession, sets };
+      ex.history[index] = { ...oldSession, sets, note:(draftNotes[exId]||"").trim() };
     }else{
-      ex.history.unshift({ id:"session_" + Date.now() + "_" + Math.random().toString(36).slice(2), date:new Date().toISOString(), sets });
+      ex.history.unshift({ id:"session_" + Date.now() + "_" + Math.random().toString(36).slice(2), date:new Date().toISOString(), sets, note:(draftNotes[exId]||"").trim() });
     }
-    draft[exId] = [{ weight:"", reps:"", tag:"N" }];
+    draft[exId] = [{ weight:"", reps:"", tag:"N", rpe:"", done:false }];
+    draftNotes[exId] = "";
     editingSession = null;
     save();
     const eligible = sets.filter(s => s.tag !== "A");
@@ -1358,7 +1437,7 @@
     }
     render();
     if(isNewPR) showToast("🏆 Novo recorde em " + ex.name + "!");
-    if(!oldSession) startRestTimer();
+    if(!oldSession && !rows.some(row=>row.done)) startRestTimer();
   }
 
   function showToast(msg, type){
@@ -1391,65 +1470,40 @@
     if(empty) empty.hidden = visible > 0;
   }
 
-  function computeSeries(ex){
-    const points = [];
-    const sessionsAsc = [...ex.history].sort((a,b) => new Date(a.date) - new Date(b.date));
-    sessionsAsc.forEach(sess => {
-      const eligible = sess.sets.filter(s => s.tag !== "A");
-      if(!eligible.length) return;
-      const best = eligible.reduce((b,c) => c.e1rm > b.e1rm ? c : b, eligible[0]);
-      points.push({ date: sess.date, e1rm: best.e1rm, weight: best.weight, reps: best.reps });
+  function evoMetricText(value,metric){ if(metric==='reps') return Math.round(value)+' reps'; if(metric==='volume') return Math.round(value).toLocaleString('pt-BR')+' '+unit+'·reps'; return formatLoad(value); }
+  function evoMetricTitle(metric){ return metric==='volume'?'Volume':metric==='reps'?'Repetições':metric==='load'?'Maior carga':'1RM estimado'; }
+  function setEvoMetric(metric){ if(['e1rm','load','reps','volume'].includes(metric)){ evoMetric=metric; renderEvolucaoView(); } }
+  function computeSeries(ex,metric){
+    const points=[];
+    const sessionsAsc=[...ex.history].sort((a,b)=>new Date(a.date)-new Date(b.date));
+    sessionsAsc.forEach(sess=>{
+      const eligible=sess.sets.filter(set=>set.tag!=="A");
+      if(!eligible.length)return;
+      const best=eligible.reduce((b,c)=>c.e1rm>b.e1rm?c:b,eligible[0]);
+      const value=metric==="volume"?eligible.reduce((total,set)=>total+displayLoad(set.weight)*set.reps,0):metric==="reps"?best.reps:metric==="load"?best.weight:best.e1rm;
+      points.push({date:sess.date,e1rm:best.e1rm,weight:best.weight,reps:best.reps,value});
     });
     return points;
   }
-
-  function generateChartSVG(points){
-    const W = 320, H = 200, padL = 34, padR = 12, padT = 16, padB = 24;
-    const innerW = W - padL - padR, innerH = H - padT - padB;
-    const values = points.map(p => p.e1rm);
-    const maxV = Math.max(...values);
-    const minV = Math.min(...values);
-    const range = (maxV - minV) || 1;
-    const stepX = points.length > 1 ? innerW / (points.length - 1) : 0;
-
-    const coords = points.map((p, i) => {
-      const x = padL + (points.length > 1 ? i * stepX : innerW / 2);
-      const y = padT + innerH - ((p.e1rm - minV) / range) * innerH;
-      return { x, y, ...p };
-    });
-
-    const linePath = coords.map((c, i) => (i === 0 ? "M" : "L") + c.x.toFixed(1) + "," + c.y.toFixed(1)).join(" ");
-    const dots = coords.map(c => {
-      const isPR = Math.abs(c.e1rm - maxV) < 0.001;
-      return `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="${isPR ? 5 : 3.5}" style="fill:${isPR ? 'var(--pr-gold)' : 'var(--accent)'};"><title>${formatDate(c.date)} · ${formatLoad(c.weight)} × ${c.reps} · 1RM ${formatLoad(c.e1rm)}</title></circle>`;
+  function generateChartSVG(points,metric){
+    const W=320,H=200,padL=42,padR=12,padT=16,padB=24;
+    const innerW=W-padL-padR,innerH=H-padT-padB;
+    const values=points.map(p=>p.value);
+    const maxV=Math.max(...values),minV=Math.min(...values),range=(maxV-minV)||1;
+    const stepX=points.length>1?innerW/(points.length-1):0;
+    const coords=points.map((p,i)=>({x:padL+(points.length>1?i*stepX:innerW/2),y:padT+innerH-((p.value-minV)/range)*innerH,...p}));
+    const linePath=coords.map((c,i)=>(i===0?"M":"L")+c.x.toFixed(1)+","+c.y.toFixed(1)).join(" ");
+    const dots=coords.map(c=>{
+      const isPR=Math.abs(c.value-maxV)<0.001;
+      return `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="${isPR?5:3.5}" style="fill:${isPR?'var(--pr-gold)':'var(--accent)'};"><title>${formatDate(c.date)} · ${evoMetricText(c.value,metric)} · ${formatLoad(c.weight)} × ${c.reps}</title></circle>`;
     }).join("");
-
-    const baseY = padT + innerH;
-    const areaPath = `${linePath} L ${coords[coords.length-1].x.toFixed(1)},${baseY} L ${coords[0].x.toFixed(1)},${baseY} Z`;
-    const gridLines = [0.25,0.5,0.75].map(fraction => {
-      const y = padT + innerH * fraction;
-      return `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${padL+innerW}" y2="${y.toFixed(1)}" class="chart-gridline"/>`;
-    }).join("");
-    const firstLabel = `<text x="${coords[0].x.toFixed(1)}" y="${H - 6}" font-size="10" font-weight="600" style="fill:var(--muted)" text-anchor="start">${formatDateShort(coords[0].date)}</text>`;
-    const lastLabel = coords.length > 1
-      ? `<text x="${coords[coords.length-1].x.toFixed(1)}" y="${H - 6}" font-size="10" font-weight="600" style="fill:var(--muted)" text-anchor="end">${formatDateShort(coords[coords.length-1].date)}</text>`
-      : "";
-
-    return `<svg class="evo-chart" role="img" aria-label="Gráfico de evolução do 1RM estimado em ${unit}" viewBox="0 0 ${W} ${H}" style="width:100%; height:auto; display:block;">
-      <defs><linearGradient id="evoAreaGradient" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".24"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
-      ${gridLines}
-      <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT+innerH}" style="stroke:var(--border); stroke-width:1;"/>
-      <line x1="${padL}" y1="${padT+innerH}" x2="${padL+innerW}" y2="${padT+innerH}" style="stroke:var(--border); stroke-width:1;"/>
-      <text x="${padL-5}" y="${padT+4}" font-size="10" font-weight="600" style="fill:var(--muted)" text-anchor="end">${formatLoad(maxV)}</text>
-      <text x="${padL-5}" y="${padT+innerH}" font-size="10" font-weight="600" style="fill:var(--muted)" text-anchor="end">${formatLoad(minV)}</text>
-      <path d="${areaPath}" fill="url(#evoAreaGradient)" stroke="none"/>
-      <path d="${linePath}" fill="none" style="stroke:var(--accent); stroke-width:3; stroke-linecap:round; stroke-linejoin:round;"/>
-      ${dots}
-      ${firstLabel}
-      ${lastLabel}
-    </svg>`;
+    const baseY=padT+innerH;
+    const areaPath=`${linePath} L ${coords[coords.length-1].x.toFixed(1)},${baseY} L ${coords[0].x.toFixed(1)},${baseY} Z`;
+    const gridLines=[0.25,0.5,0.75].map(fraction=>`<line x1="${padL}" y1="${(padT+innerH*fraction).toFixed(1)}" x2="${padL+innerW}" y2="${(padT+innerH*fraction).toFixed(1)}" class="chart-gridline"/>`).join("");
+    const firstLabel=`<text x="${coords[0].x.toFixed(1)}" y="${H-6}" font-size="10" font-weight="600" style="fill:var(--muted)" text-anchor="start">${formatDateShort(coords[0].date)}</text>`;
+    const lastLabel=coords.length>1?`<text x="${coords[coords.length-1].x.toFixed(1)}" y="${H-6}" font-size="10" font-weight="600" style="fill:var(--muted)" text-anchor="end">${formatDateShort(coords[coords.length-1].date)}</text>`:"";
+    return `<svg class="evo-chart" role="img" aria-label="Gráfico de evolução: ${evoMetricTitle(metric)}" viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;"><defs><linearGradient id="evoAreaGradient" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".24"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>${gridLines}<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${baseY}" style="stroke:var(--border);stroke-width:1;"/><line x1="${padL}" y1="${baseY}" x2="${padL+innerW}" y2="${baseY}" style="stroke:var(--border);stroke-width:1;"/><text x="${padL-5}" y="${padT+4}" font-size="10" font-weight="600" style="fill:var(--muted)" text-anchor="end">${evoMetricText(maxV,metric)}</text><text x="${padL-5}" y="${baseY}" font-size="10" font-weight="600" style="fill:var(--muted)" text-anchor="end">${evoMetricText(minV,metric)}</text><path d="${areaPath}" fill="url(#evoAreaGradient)" stroke="none"/><path d="${linePath}" fill="none" style="stroke:var(--accent);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;"/>${dots}${firstLabel}${lastLabel}</svg>`;
   }
-
   function renderEvolucaoView(){
     const container = document.getElementById("evolucaoView");
     const allEx = data.exercises;
@@ -1474,7 +1528,7 @@
     }).join("");
 
     const ex = selectedEx;
-    const points = computeSeries(ex);
+    const points = computeSeries(ex,evoMetric);
     const pr = getPR(ex);
 
     let chartHtml;
@@ -1482,20 +1536,20 @@
       chartHtml = '<div class="chart-empty-state"><div class="chart-empty-icon" aria-hidden="true">▥</div><b>O gráfico começa com uma série registrada</b><p>Abra este exercício na aba Treino, informe carga e repetições e salve a série.</p></div>';
     }else if(points.length === 1){
       const p = points[0];
-      chartHtml = `<div class="chart-empty-state"><div class="chart-empty-icon" aria-hidden="true">↗</div><b>Primeiro registro salvo!</b><p>${formatDate(p.date)} · ${formatLoad(p.weight)} × ${p.reps} · 1RM ${formatLoad(p.e1rm)}.<br>Mais um treino e sua linha de evolução aparece aqui.</p></div>`;
+      chartHtml = `<div class="chart-empty-state"><div class="chart-empty-icon" aria-hidden="true">↗</div><b>Primeiro registro salvo!</b><p>${formatDate(p.date)} · ${formatLoad(p.weight)} × ${p.reps} · ${evoMetricText(p.value,evoMetric)}.<br>Mais um treino e sua linha de evolução aparece aqui.</p></div>`;
     }else{
-      chartHtml = generateChartSVG(points) + `<div class="chart-caption">Força estimada (1RM) por treino, em ${unit} — 🟡 ponto = recorde</div><div class="chart-points">${points.slice().reverse().map(point => `<div class="chart-point"><span>${formatDate(point.date)}</span><span>${formatLoad(point.weight)} × ${point.reps} · 1RM ${formatLoad(point.e1rm)}</span></div>`).join("")}</div>`;
+      chartHtml = generateChartSVG(points,evoMetric) + `<div class="chart-caption">${evoMetricTitle(evoMetric)} por treino — 🟡 ponto = melhor marca</div><div class="chart-points">${points.slice().reverse().map(point => `<div class="chart-point"><span>${formatDate(point.date)}</span><span>${evoMetricText(point.value,evoMetric)} · ${formatLoad(point.weight)} × ${point.reps}</span></div>`).join("")}</div>`;
     }
 
     const statsHtml = points.length ? `
       <div class="evo-stats">
         <div class="evo-stat">
           <span class="evo-label">Primeiro registro</span>
-          <span class="evo-value">${formatLoad(points[0].weight)} × ${points[0].reps}</span>
+          <span class="evo-value">${evoMetricText(points[0].value,evoMetric)}</span>
         </div>
         <div class="evo-stat">
-          <span class="evo-label">PR atual</span>
-          <span class="evo-value pr">${formatLoad(pr.weight)} × ${pr.reps}</span>
+          <span class="evo-label">${evoMetric==="e1rm"?"PR atual":"Melhor marca"}</span>
+          <span class="evo-value pr">${evoMetricText(Math.max(...points.map(point=>point.value)),evoMetric)}</span>
         </div>
       </div>
     ` : "";
@@ -1509,7 +1563,7 @@
         <div class="evo-exercise-grid">${options}</div><p id="evoNoMatches" class="evo-no-matches" ${visibleExerciseCount ? "hidden" : ""}>Nenhum exercício corresponde à busca.</p>
       </section>
       <div class="evo-selected-heading"><div><span class="evo-kicker">ANÁLISE ATUAL</span><h3>${escapeHtml(ex.name)}</h3></div><span class="evo-selected-day">${escapeHtml(selectedDay?.name || "Sem dia")}</span></div>
-      <div class="chart-card">${chartHtml}</div>
+      <label class="evo-metric-control">Mostrar evolução por<select aria-label="Métrica de evolução" onchange="setEvoMetric(this.value)"><option value="e1rm" ${evoMetric==="e1rm"?"selected":""}>1RM estimado</option><option value="load" ${evoMetric==="load"?"selected":""}>Maior carga</option><option value="reps" ${evoMetric==="reps"?"selected":""}>Repetições</option><option value="volume" ${evoMetric==="volume"?"selected":""}>Volume</option></select></label><div class="chart-card">${chartHtml}</div>
       ${statsHtml}
     `;
   }
@@ -1569,6 +1623,14 @@
       entry.exerciseNames.add(ex.name);
       entry.sets += session.sets.length;
     }));
+    (data.workoutHistory||[]).forEach(workout=>{
+      const date=new Date(workout.startedAt||workout.finishedAt);
+      if(!Number.isFinite(date.getTime())) return;
+      const key=calendarDateKey(date)+"|"+(workout.dayId||"sem-dia");
+      const entry=entries.get(key);
+      if(entry){ entry.durationSeconds=workout.durationSeconds; entry.exerciseCount=workout.exerciseCount; entry.finishedWorkout=true; }
+      else entries.set(key,{date:workout.finishedAt,dayId:workout.dayId,dayName:data.days.find(day=>day.id===workout.dayId)?.name||"Treino",exerciseNames:new Set(),exerciseCount:workout.exerciseCount||0,sets:workout.setCount||0,durationSeconds:workout.durationSeconds,finishedWorkout:true});
+    });
     const entriesByDate = new Map();
     entries.forEach(entry => {
       const key = calendarDateKey(new Date(entry.date));
@@ -1600,7 +1662,7 @@
     const selectedLabel = selectedDate ? selectedDate.toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"}) : "Escolha uma data";
     const selectedEntries = selectedCalendarDate ? (entriesByDate.get(selectedCalendarDate) || []) : [];
     const selectedHtml = selectedEntries.map(entry =>
-      `<article class="calendar-session-card"><div class="calendar-session-info"><b>${escapeHtml(entry.dayName)}</b><span>${entry.exerciseNames.size} exercício(s) · ${entry.sets} série(s)</span></div>${entry.dayId && data.days.some(day=>day.id===entry.dayId) ? `<button type="button" onclick="openWorkoutDay('${escapeHtml(entry.dayId)}')">Abrir treino</button>` : ""}</article>`
+      `<article class="calendar-session-card"><div class="calendar-session-info"><b>${escapeHtml(entry.dayName)}</b><span>${entry.exerciseCount===undefined?entry.exerciseNames.size:entry.exerciseCount} exercício(s) · ${entry.sets} série(s)${Number.isFinite(entry.durationSeconds)?` · ${formatDuration(entry.durationSeconds)}`:""}</span></div>${entry.dayId && data.days.some(day=>day.id===entry.dayId) ? `<button type="button" onclick="openWorkoutDay('${escapeHtml(entry.dayId)}')">Abrir treino</button>` : ""}</article>`
     ).join("");
 
     container.innerHTML = `<div class="calendar-heading"><div><h2>Calendário</h2><p>Toque numa data para ver o treino registrado.</p></div></div>
@@ -1634,11 +1696,11 @@
     const dayName = data.days.find(d => d.id === data.currentDayId)?.name || "";
 
     workspace.innerHTML = `<div class="day-workspace" aria-label="Dia de treino selecionado">
-      <div class="day-selector-wrap"><label class="day-selector-label" for="activeDaySelect">DIA ATUAL</label><select class="day-selector" id="activeDaySelect" aria-label="Selecionar dia de treino" onchange="selectDay(this.value)">
+      <div class="day-selector-wrap"><label class="day-selector-label" for="activeDaySelect">ROTINA ATUAL</label><select class="day-selector" id="activeDaySelect" aria-label="Selecionar rotina" onchange="selectDay(this.value)">
         ${data.days.map(day => `<option value="${escapeHtml(day.id)}" ${day.id === data.currentDayId ? "selected" : ""}>${escapeHtml(day.name)}</option>`).join("")}
       </select></div>
-      <button type="button" class="session-action" aria-label="Copiar dia e seus exercícios" onclick="copyCurrentDay()">Copiar dia</button>
-    </div><div class="day-management"><span>Organize seus exercícios por rotina.</span><div class="day-management-actions"><button type="button" onclick="deleteCurrentDay()">Remover dia</button></div></div>`;
+      <button type="button" class="session-action" aria-label="Duplicar rotina e exercícios" onclick="copyCurrentDay()">Duplicar rotina</button>
+    </div><div class="day-management"><span>Modelo reutilizável · histórico no Calendário.</span><div class="day-management-actions"><button type="button" onclick="deleteCurrentDay()">Remover rotina</button></div></div>`;
 
     if(!dayExercises.length){
       list.innerHTML = `<section class="empty-state"><span class="empty-state-kicker">${escapeHtml(dayName).toLocaleUpperCase("pt-BR")} · PRIMEIRO PASSO</span><h3>Vamos montar esse treino?</h3><p>Adicione um exercício pelo campo acima. Toque numa sugestão para preencher rapidamente:</p><div class="starter-chips"><button class="starter-chip" type="button" onclick="selectStarterExercise('Supino reto')">Supino reto</button><button class="starter-chip" type="button" onclick="selectStarterExercise('Agachamento')">Agachamento</button><button class="starter-chip" type="button" onclick="selectStarterExercise('Puxada frontal')">Puxada frontal</button></div><div class="empty-state-steps"><div class="empty-state-step"><b>01</b><span>Escolha o exercício</span></div><div class="empty-state-step"><b>02</b><span>Registre carga e reps</span></div><div class="empty-state-step"><b>03</b><span>Acompanhe seu PR</span></div></div></section>`;
@@ -1670,6 +1732,7 @@
                 oninput="syncDraft('${ex.id}', ${idx}, 'reps', this.value)">
             </div>
             <label class="sr-only" for="setType_${ex.id}_${idx}">Tipo da série ${idx+1}</label><select id="setType_${ex.id}_${idx}" class="set-type tag-${r.tag}" aria-label="Tipo da série ${idx+1}" onchange="setTag('${ex.id}', ${idx}, this.value)"><option value="A" ${r.tag==='A'?'selected':''}>A</option><option value="N" ${r.tag==='N'?'selected':''}>N</option><option value="F" ${r.tag==='F'?'selected':''}>F</option></select>
+            <label class="sr-only" for="rpe_${ex.id}_${idx}">Esforço RPE da série ${idx+1}</label><select id="rpe_${ex.id}_${idx}" class="set-rpe" aria-label="RPE da série ${idx+1}" onchange="syncDraft('${ex.id}',${idx},'rpe',this.value)">${rpeOptions(r.rpe)}</select>
             <button type="button" class="set-done ${r.done ? "done" : ""}" aria-pressed="${Boolean(r.done)}" aria-label="${r.done ? `Série ${idx+1} concluída` : `Marcar série ${idx+1} como concluída`}" onclick="toggleSetDone('${ex.id}', ${idx}, this)">✓</button>
             <button class="rm-set" onclick="removeSetRow('${ex.id}', ${idx})">✕</button>
           </div>
@@ -1678,15 +1741,17 @@
         const historyHtml = ex.history.slice(0, 15).map(sess => {
           const setsHtml = sess.sets.map(s => {
             const isPR = pr && s.id === pr.id;
-            return `<span class="set-pill tag-${s.tag} ${isPR ? 'is-pr' : ''}">${s.tag} · ${formatLoad(s.weight)} × ${s.reps}${isPR ? '<span class="pr-badge">PR</span>' : ''}</span>`;
+            return `<span class="set-pill tag-${s.tag} ${isPR ? 'is-pr' : ''}">${s.tag} · ${formatLoad(s.weight)} × ${s.reps}${s.rpe ? ' · RPE '+s.rpe : ''}${isPR ? '<span class="pr-badge">PR</span>' : ''}</span>`;
           }).join("");
-          return `<div class="session"><div class="session-date">${formatDate(sess.date)}</div><div class="session-sets">${setsHtml}</div><div class="session-actions"><button type="button" class="session-action" aria-label="Editar sessão de ${formatDate(sess.date)}" onclick="editSession('${ex.id}','${sess.id}')">Editar</button><button type="button" class="session-action delete" aria-label="Apagar sessão de ${formatDate(sess.date)}" onclick="deleteSession('${ex.id}','${sess.id}')">Apagar</button></div></div>`;
+          return `<div class="session"><div class="session-date">${formatDate(sess.date)}</div><div class="session-sets">${setsHtml}</div>${sess.note ? `<p class="session-note-text">${escapeHtml(sess.note)}</p>` : ""}<div class="session-actions"><button type="button" class="session-action" aria-label="Editar sessão de ${formatDate(sess.date)}" onclick="editSession('${ex.id}','${sess.id}')">Editar</button><button type="button" class="session-action delete" aria-label="Apagar sessão de ${formatDate(sess.date)}" onclick="deleteSession('${ex.id}','${sess.id}')">Apagar</button></div></div>`;
         }).join("");
 
         bodyHtml = `
           <div class="exercise-body open">
-            <div class="set-table-head" aria-hidden="true"><span>#</span><span>Carga (${unit})</span><span>Reps</span><span>Tipo</span><span>OK</span><span></span></div>
+            <div class="set-table-head" aria-hidden="true"><span>#</span><span>Carga (${unit})</span><span>Reps</span><span>Tipo</span><span>RPE</span><span>OK</span><span></span></div>
             ${rowsHtml}
+            <div class="exercise-session-note"><label for="note_${ex.id}">Nota desta sessão</label><textarea id="note_${ex.id}" maxlength="1000" placeholder="Técnica, sensação ou observação..." oninput="syncDraftNote('${ex.id}',this.value)">${escapeHtml(draftNotes[ex.id]||"")}</textarea></div>
+            <div class="exercise-rest-setting"><label for="rest_${ex.id}">Descanso automático</label><select id="rest_${ex.id}" onchange="saveExerciseRest('${ex.id}',this.value)"><option value="30">30 s</option><option value="60">60 s</option><option value="90">90 s</option><option value="120">2 min</option><option value="180">3 min</option></select><span>Inicia ao marcar uma série como concluída.</span></div>
             <div class="tag-legend"><b>A</b> aquecimento · <b>N</b> normal · <b>F</b> falha</div>
             <div class="set-actions">
               <button class="btn-add-set" onclick="addSetRow('${ex.id}')">+ Adicionar série</button>
@@ -1715,6 +1780,7 @@
     }).join("");
 
     list.innerHTML = cards;
+    document.querySelectorAll(".exercise-rest-setting select").forEach(select=>{ const ex=data.exercises.find(item=>item.id===select.id.slice(5)); if(ex) select.value=String(ex.restSeconds||90); });
     document.querySelectorAll(".tag-btn").forEach(btn => {
       if(btn.dataset.active === "true") btn.classList.add("active");
     });
